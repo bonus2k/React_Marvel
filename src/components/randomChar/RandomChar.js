@@ -1,16 +1,14 @@
 import './randomChar.scss';
-import thor from '../../resources/img/thor.jpeg';
 import mjolnir from '../../resources/img/mjolnir.png';
 import {Component} from "react";
 import MarvelService from "../../services/MarvelService";
-
+import Spiner from "../spiner/Spiner";
+import Error from "../error/Error";
 
 class RandomChar extends Component {
-
     constructor(props) {
         super(props);
         this.getRandomChar();
-
         this.state = {
             charRandom: {
                 name: null,
@@ -18,40 +16,39 @@ class RandomChar extends Component {
                 thumbnail: null,
                 homepage: null,
                 wiki: null
-            }
+            },
+            loading: true,
+            error: false,
         }
     }
 
+    onLoadRandomChar = (charRandom) => {
+        this.setState({charRandom, loading: false})
+    }
+
+    onError = () => {
+        this.setState({error: true, loading: false})
+    }
 
     getRandomChar = () => {
         const marvelServices = new MarvelService(),
-        id = Math.floor(Math.random() * 5000 + 1009000)
-        marvelServices.getCharacter(1009299)
-            .then(charRandom => this.setState({charRandom}))
-            .catch(()=>this.getRandomChar());
+            id = Math.floor(Math.random() * 400 + 1011000)
+        marvelServices.getCharacter(id)
+            .then(this.onLoadRandomChar)
+            .catch(this.onError);
     }
 
+
     render() {
-        const {name, description, thumbnail, homepage, wiki} = this.state.charRandom;
+        const {charRandom, loading, error} = this.state,
+            load = loading ? <Spiner/> : null,
+            errorPic = error ? <Error/> : null,
+            char = !(loading || error) ? <RenderChar char={charRandom}/> : null;
         return (
             <div className="randomchar">
-                <div className="randomchar__block">
-                    <img src={thumbnail} alt="Random character" className="randomchar__img"/>
-                    <div className="randomchar__info">
-                        <p className="randomchar__name">{name}</p>
-                        <p className="randomchar__descr">
-                            {description}
-                        </p>
-                        <div className="randomchar__btns">
-                            <a href={homepage} className="button button__main">
-                                <div className="inner">homepage</div>
-                            </a>
-                            <a href={wiki} className="button button__secondary">
-                                <div className="inner">Wiki</div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                {errorPic}
+                {load}
+                {char}
                 <div className="randomchar__static">
                     <p className="randomchar__title">
                         Random character for today!<br/>
@@ -68,6 +65,31 @@ class RandomChar extends Component {
             </div>
         )
     }
+
+
 }
+
+    const RenderChar = ({char}) => {
+        const {name, description, thumbnail, homepage, wiki} = char;
+        return (
+            <div className="randomchar__block">
+                <img src={thumbnail} alt="Random character" className="randomchar__img"/>
+                <div className="randomchar__info">
+                    <p className="randomchar__name">{name}</p>
+                    <p className="randomchar__descr">
+                        {description}
+                    </p>
+                    <div className="randomchar__btns">
+                        <a href={homepage} className="button button__main">
+                            <div className="inner">homepage</div>
+                        </a>
+                        <a href={wiki} className="button button__secondary">
+                            <div className="inner">Wiki</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
 export default RandomChar;
