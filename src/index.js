@@ -6,7 +6,7 @@ import MarvelService from "./services/MarvelService";
 
 const marvelServices = new MarvelService();
 
-marvelServices.getCharacter(1011196).then(res => res.data.results.forEach(item => console.log(item.name)));
+// marvelServices.getCharacter(1009368).then(console.log);
 
 ReactDOM.render(
   <React.StrictMode>
