@@ -11,7 +11,7 @@ const Spiner = () => {
             height="200px"
             viewBox="0 0 100 100"
             preserveAspectRatio="xMidYMid"
-            display="block"
+            display="fill"
         >
             <rect
                 x={47.5}

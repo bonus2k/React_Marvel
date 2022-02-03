@@ -25,11 +25,13 @@ class MarvelService {
     _transformCharacter = (char) => {
         const str = char.description;
         return {
+            id: char.id,
             name: char.name,
             description: (str.length > 237) ? this.cutStringLastSpaceLength(str, 220) : str,
             thumbnail: `${char.thumbnail.path}.${char.thumbnail.extension}`,
             homepage: char.urls[0].url,
-            wiki: char.urls[1].url
+            wiki: char.urls[1].url,
+            comics: char.comics.items
         };
     }
 

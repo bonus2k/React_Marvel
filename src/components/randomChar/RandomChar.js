@@ -5,10 +5,11 @@ import MarvelService from "../../services/MarvelService";
 import Spiner from "../spiner/Spiner";
 import Error from "../error/Error";
 
+
 class RandomChar extends Component {
     constructor(props) {
         super(props);
-        this.getRandomChar();
+
         this.state = {
             charRandom: {
                 name: null,
@@ -22,6 +23,14 @@ class RandomChar extends Component {
         }
     }
 
+    componentDidMount() {
+        this.getRandomChar();
+    }
+
+    onLoadingChar = () =>{
+        this.setState({loading: true})
+    }
+
     onLoadRandomChar = (charRandom) => {
         this.setState({charRandom, loading: false})
     }
@@ -31,6 +40,7 @@ class RandomChar extends Component {
     }
 
     getRandomChar = () => {
+        this.onLoadingChar();
         const marvelServices = new MarvelService(),
             id = Math.floor(Math.random() * 400 + 1011000)
         marvelServices.getCharacter(id)
@@ -65,31 +75,31 @@ class RandomChar extends Component {
             </div>
         )
     }
-
-
 }
 
-    const RenderChar = ({char}) => {
-        const {name, description, thumbnail, homepage, wiki} = char;
-        return (
-            <div className="randomchar__block">
-                <img src={thumbnail} alt="Random character" className="randomchar__img"/>
-                <div className="randomchar__info">
-                    <p className="randomchar__name">{name}</p>
-                    <p className="randomchar__descr">
-                        {description}
-                    </p>
-                    <div className="randomchar__btns">
-                        <a href={homepage} className="button button__main">
-                            <div className="inner">homepage</div>
-                        </a>
-                        <a href={wiki} className="button button__secondary">
-                            <div className="inner">Wiki</div>
-                        </a>
-                    </div>
+const RenderChar = ({char}) => {
+    const {name, description, thumbnail, homepage, wiki} = char,
+        style = thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {}
+    return (
+        <div className="randomchar__block">
+            <img src={thumbnail} alt="Random character" className="randomchar__img" style={style}/>
+
+            <div className="randomchar__info">
+                <p className="randomchar__name">{name}</p>
+                <p className="randomchar__descr">
+                    {description}
+                </p>
+                <div className="randomchar__btns">
+                    <a href={homepage} className="button button__main">
+                        <div className="inner">homepage</div>
+                    </a>
+                    <a href={wiki} className="button button__secondary">
+                        <div className="inner">Wiki</div>
+                    </a>
                 </div>
             </div>
-        )
-    }
+        </div>
+    )
+}
 
 export default RandomChar;
