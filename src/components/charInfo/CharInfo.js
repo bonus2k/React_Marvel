@@ -4,6 +4,7 @@ import MarvelService from "../../services/MarvelService";
 import Skeleton from "../skeleton/Skeleton";
 import Spiner from "../spiner/Spiner";
 import Error from "../error/Error";
+import PropTypes from 'prop-types';
 
 class CharInfo extends Component {
 
@@ -112,4 +113,7 @@ function View({char}) {
     )
 }
 
+CharInfo.propTypes = {
+    selectedChar: PropTypes.number
+}
 export default CharInfo;

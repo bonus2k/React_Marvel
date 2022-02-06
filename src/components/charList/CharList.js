@@ -3,7 +3,8 @@ import './charList.scss';
 import {Component} from "react";
 import MarvelService from "../../services/MarvelService";
 import Spiner from "../spiner/Spiner";
-
+import Error from "../error/Error";
+import PropTypes from 'prop-types';
 
 class CharList extends Component {
 
@@ -11,17 +12,47 @@ class CharList extends Component {
         super(props);
         this.state = {
             listChar: [],
-            loadList: false
+            loadList: true,
+            error: false,
+            offset: 210,
+            newItemLoading: false,
+            charEnded: false
         }
     }
 
-    onLoadCharList = (listChar) => {
-        this.setState({listChar, loadList: true})
+    marvelService = new MarvelService();
+
+    onLoadCharList = (newListChar) => {
+        this.setState(({offset, listChar}) => ({
+            listChar: [...listChar, ...newListChar],
+            loadList: false,
+            newItemLoading: false,
+            charEnded: newListChar.length < 9,
+            offset: offset + 9
+        }))
+    }
+
+    onNewItemLoading = () => {
+        this.setState({newItemLoading: true})
+    }
+
+    onRequest = (offset) => {
+        this.onNewItemLoading();
+        this.marvelService
+            .getAllCharacters(offset)
+            .then(this.onLoadCharList)
+            .catch(this.onError)
+    }
+
+    onError = () => {
+        this.setState({
+            error: true,
+            loadList: false
+        })
     }
 
     componentDidMount() {
-        const marvelService = new MarvelService();
-        marvelService.getAllCharacters().then(this.onLoadCharList)
+        this.onRequest()
     }
 
     GetCharList() {
@@ -37,23 +68,34 @@ class CharList extends Component {
     }
 
     render() {
-        const {loadList} = this.state,
-        charList = loadList ? this.GetCharList() : <Spiner />;
+        const {loadList, error, offset, newItemLoading, charEnded} = this.state,
+            errorMsg = error ? <Error/> : null,
+            spiner = loadList ? <Spiner/> : null,
+            charList = !(loadList || error) ? this.GetCharList() : null;
         return (
             <div className="char__list">
                 <ul className="char__grid">
+                    {errorMsg}
+                    {spiner}
                     {charList}
                 </ul>
-                <button className="button button__main button__long">
-                    <div className="inner">load more</div>
+                <button
+                    className="button button__main button__long"
+                    disabled={newItemLoading}
+                    style={{'display': charEnded ? 'none' : 'block'}}
+                    onClick={() => this.onRequest(offset)}>
+                    <div
+                        className="inner">load more
+                    </div>
                 </button>
             </div>
         )
     }
-
-
 }
 
+CharList.propTypes = {
+    onSelectedChar: PropTypes.func.isRequired
+}
 
 
 export default CharList;
