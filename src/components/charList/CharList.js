@@ -4,7 +4,7 @@ import {Component} from "react";
 import MarvelService from "../../services/MarvelService";
 import Spiner from "../spiner/Spiner";
 import Error from "../error/Error";
-import PropTypes from 'prop-types';
+import PropTypes, {element} from 'prop-types';
 
 class CharList extends Component {
 
@@ -18,6 +18,40 @@ class CharList extends Component {
             newItemLoading: false,
             charEnded: false
         }
+
+        this.setCharList = [];
+
+        this.setChar = (element) => {
+            this.setCharList.push(element);
+            element.addEventListener('focus', (event) => this.addSelected(event, element.id));
+            element.addEventListener('blur', (event) => this.removeSelected(event));
+        }
+    }
+
+    addSelected = (event, id) => {
+        this.findLiElement(event).add('char__item_selected');
+        this.props.onSelectedChar(+id);
+    }
+
+    removeSelected = (event) => {
+        this.findLiElement(event).remove('char__item_selected');
+    }
+
+    findLiElement = (event) => {
+        let eventChar = event.target
+        while (eventChar != document) {
+            if (eventChar && eventChar.tagName == "LI") {
+                return eventChar.classList
+            }
+            eventChar = eventChar.parentNode;
+        }
+    }
+
+    componentWillUnmount() {
+        this.setCharList.forEach(element => {
+            element.removeEventListener('focus', (event) => this.addSelected(event, element.id));
+            element.removeEventListener('blur', (event) => this.removeSelected(event));
+        })
     }
 
     marvelService = new MarvelService();
@@ -58,7 +92,9 @@ class CharList extends Component {
     GetCharList() {
         return this.state.listChar.map(current =>
             <li key={current.id}
-                onClick={() => this.props.onSelectedChar(current.id)}
+                tabIndex={0}
+                id={current.id}
+                ref={this.setChar}
                 className="char__item">
                 <img src={current.thumbnail} alt={current.name}
                      style={current.thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {}}/>
