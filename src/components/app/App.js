@@ -5,43 +5,36 @@ import CharInfo from "../charInfo/CharInfo";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from '../../resources/img/vision.png';
-import {Component} from "react";
+import {useState} from "react";
 
-class App extends Component {
-    state = {
-        selectedChar : null
+const App = () => {
+    const [char, setChar] = useState(null);
+
+    const onSelectedChar = (id) => {
+        setChar(id);
     }
 
-    onSelectedChar = (id) =>{
-        this.setState({
-            selectedChar : id
-        })
-    }
-
-
-    render() {
-        return (
-            <div className="app">
+    return (
+        <div className="app">
+            <ErrorBoundary>
+                <AppHeader/>
+            </ErrorBoundary>
+            <main>
                 <ErrorBoundary>
-                    <AppHeader/>
+                    <RandomChar/>
                 </ErrorBoundary>
-                <main>
+                <div className="char__content">
                     <ErrorBoundary>
-                        <RandomChar/>
+                        <CharList onSelectedChar={onSelectedChar}/>
                     </ErrorBoundary>
-                    <div className="char__content">
-                        <ErrorBoundary>
-                            <CharList onSelectedChar = {this.onSelectedChar}/>
-                        </ErrorBoundary>
-                        <ErrorBoundary>
-                            <CharInfo selectedChar = {this.state.selectedChar}/>
-                        </ErrorBoundary>
-                    </div>
-                    <img className="bg-decoration" src={decoration} alt="vision"/>
-                </main>
-            </div>
-        )
-    }
+                    <ErrorBoundary>
+                        <CharInfo selectedChar={char}/>
+                    </ErrorBoundary>
+                </div>
+                <img className="bg-decoration" src={decoration} alt="vision"/>
+            </main>
+        </div>
+    )
 }
 
 export default App;

@@ -1,59 +1,73 @@
-import './randomChar.scss';
-import mjolnir from '../../resources/img/mjolnir.png';
-import {Component} from "react";
-import MarvelService from "../../services/MarvelService";
-import Spiner from "../spiner/Spiner";
-import Error from "../error/Error";
+        import './randomChar.scss';
+        import mjolnir from '../../resources/img/mjolnir.png';
+        import {useEffect, useState} from "react";
+        import MarvelService from "../../services/MarvelService";
+        import Spiner from "../spiner/Spiner";
+        import Error from "../error/Error";
 
 
-class RandomChar extends Component {
-    constructor(props) {
-        super(props);
+    const RandomChar = () => {
+        const [charRandom, setCharRandom] = useState();
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(false);
 
-        this.state = {
-            charRandom: {
-                name: null,
-                description: null,
-                thumbnail: null,
-                homepage: null,
-                wiki: null
-            },
-            loading: true,
-            error: false,
+        useEffect(() => {
+            getRandomChar(); // eslint-disable-next-line
+        }, [])
+
+        const onLoadingChar = () => {
+            setLoading(true);
         }
-    }
 
-    componentDidMount() {
-        this.getRandomChar();
-    }
+        const onLoadRandomChar = (charRandom) => {
+            setCharRandom(charRandom);
+            setLoading(false);
+        }
 
-    onLoadingChar = () =>{
-        this.setState({loading: true})
-    }
+        const onError = () => {
+            setError(true);
+            setLoading(false);
+        }
 
-    onLoadRandomChar = (charRandom) => {
-        this.setState({charRandom, loading: false})
-    }
+        const getRandomChar = () => {
+            onLoadingChar();
+            const marvelServices = new MarvelService(),
+                id = Math.floor(Math.random() * 400 + 1011000)
+            marvelServices.getCharacter(id)
+                .then(onLoadRandomChar)
+                .catch(onError);
+        }
 
-    onError = () => {
-        this.setState({error: true, loading: false})
-    }
+        const RenderChar = () => {
 
-    getRandomChar = () => {
-        this.onLoadingChar();
-        const marvelServices = new MarvelService(),
-            id = Math.floor(Math.random() * 400 + 1011000)
-        marvelServices.getCharacter(id)
-            .then(this.onLoadRandomChar)
-            .catch(this.onError);
-    }
+            const {name, description, thumbnail, homepage, wiki} = charRandom,
+                style = thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {}
+            return (
+                <div className="randomchar__block">
+                    <img src={thumbnail} alt="Random character" className="randomchar__img" style={style}/>
 
+                    <div className="randomchar__info">
+                        <p className="randomchar__name">{name}</p>
+                        <p className="randomchar__descr">
+                            {description}
+                        </p>
+                        <div className="randomchar__btns">
+                            <a href={homepage} className="button button__main">
+                                <div className="inner">homepage</div>
+                            </a>
+                            <a href={wiki} className="button button__secondary">
+                                <div className="inner">Wiki</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
 
-    render() {
-        const {charRandom, loading, error} = this.state,
-            load = loading ? <Spiner/> : null,
+        const load = loading ? <Spiner/> : null,
             errorPic = error ? <Error/> : null,
-            char = !(loading || error) ? <RenderChar char={charRandom}/> : null;
+            char = !(loading || error) ? <RenderChar/> : null;
+
         return (
             <div className="randomchar">
                 {errorPic}
@@ -67,39 +81,13 @@ class RandomChar extends Component {
                     <p className="randomchar__title">
                         Or choose another one
                     </p>
-                    <button onClick={this.getRandomChar} className="button button__main">
+                    <button onClick={getRandomChar} className="button button__main">
                         <div className="inner">try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
                 </div>
             </div>
         )
+
     }
-}
-
-const RenderChar = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki} = char,
-        style = thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {}
-    return (
-        <div className="randomchar__block">
-            <img src={thumbnail} alt="Random character" className="randomchar__img" style={style}/>
-
-            <div className="randomchar__info">
-                <p className="randomchar__name">{name}</p>
-                <p className="randomchar__descr">
-                    {description}
-                </p>
-                <div className="randomchar__btns">
-                    <a href={homepage} className="button button__main">
-                        <div className="inner">homepage</div>
-                    </a>
-                    <a href={wiki} className="button button__secondary">
-                        <div className="inner">Wiki</div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-export default RandomChar;
+        export default RandomChar;

@@ -1,132 +1,127 @@
 import './charList.scss';
 
-import {Component} from "react";
+import {useState, useEffect, useRef} from "react";
 import MarvelService from "../../services/MarvelService";
 import Spiner from "../spiner/Spiner";
 import Error from "../error/Error";
-import PropTypes, {element} from 'prop-types';
+import PropTypes from 'prop-types';
 
-class CharList extends Component {
+const CharList = (props) => {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            listChar: [],
-            loadList: true,
-            error: false,
-            offset: 210,
-            newItemLoading: false,
-            charEnded: false
-        }
+    const [listChar, setListChar] = useState([]);
+    const [loadList, setLoadList] = useState(true);
+    const [error, setError] = useState(false);
+    const [offset, setOffset] = useState(210);
+    const [newItemLoading, setNewItemLoading] = useState(false);
+    const [charEnded, setCharEnded] = useState(false);
+    const refItem = useRef([]);
+    const marvelService = new MarvelService();
 
-        this.setCharList = [];
-
-        this.setChar = (element) => {
-            this.setCharList.push(element);
-            element.addEventListener('focus', (event) => this.addSelected(event, element.id));
-            element.addEventListener('blur', (event) => this.removeSelected(event));
-        }
+    const setChar = (element) => {
+        element.addEventListener('focus', (event) => addSelected(event, element.id));
+        element.addEventListener('blur', (event) => removeSelected(event));
     }
 
-    addSelected = (event, id) => {
-        this.findLiElement(event).add('char__item_selected');
-        this.props.onSelectedChar(+id);
+    useEffect(() => {
+        refItem.current.forEach(setChar);
+        clearEvent();
+    })
+
+
+    const addSelected = (event, id) => {
+        findLiElement(event).add('char__item_selected');
+        props.onSelectedChar(+id);
     }
 
-    removeSelected = (event) => {
-        this.findLiElement(event).remove('char__item_selected');
+    const removeSelected = (event) => {
+        findLiElement(event).remove('char__item_selected');
     }
 
-    findLiElement = (event) => {
+    const findLiElement = (event) => {
         let eventChar = event.target
-        while (eventChar != document) {
-            if (eventChar && eventChar.tagName == "LI") {
+        while (eventChar !== document) {
+            if (eventChar && eventChar.tagName === "LI") {
                 return eventChar.classList
             }
             eventChar = eventChar.parentNode;
         }
     }
 
-    componentWillUnmount() {
-        this.setCharList.forEach(element => {
-            element.removeEventListener('focus', (event) => this.addSelected(event, element.id));
-            element.removeEventListener('blur', (event) => this.removeSelected(event));
+    const clearEvent = () => {
+        refItem.current.forEach(element => {
+            element.removeEventListener('focus', (event) => addSelected(event, element.id));
+            element.removeEventListener('blur', (event) => removeSelected(event));
         })
     }
 
-    marvelService = new MarvelService();
 
-    onLoadCharList = (newListChar) => {
-        this.setState(({offset, listChar}) => ({
-            listChar: [...listChar, ...newListChar],
-            loadList: false,
-            newItemLoading: false,
-            charEnded: newListChar.length < 9,
-            offset: offset + 9
-        }))
+    const onLoadCharList = (newListChar) => {
+        setListChar(listChar => [...listChar, ...newListChar]);
+        setLoadList(false);
+        setNewItemLoading(false);
+        setCharEnded(newListChar.length < 9);
+        setOffset(offset => offset + 9);
     }
 
-    onNewItemLoading = () => {
-        this.setState({newItemLoading: true})
+    const onNewItemLoading = () => {
+        setNewItemLoading(true);
     }
 
-    onRequest = (offset) => {
-        this.onNewItemLoading();
-        this.marvelService
+    const onRequest = (offset) => {
+        onNewItemLoading();
+        marvelService
             .getAllCharacters(offset)
-            .then(this.onLoadCharList)
-            .catch(this.onError)
+            .then(onLoadCharList)
+            .catch(onError);
     }
 
-    onError = () => {
-        this.setState({
-            error: true,
-            loadList: false
-        })
+    const onError = () => {
+        setError(true);
+        setLoadList(false);
     }
 
-    componentDidMount() {
-        this.onRequest()
-    }
+    useEffect(() => {
+        onRequest(); // eslint-disable-next-line
+    }, [])
 
-    GetCharList() {
-        return this.state.listChar.map(current =>
-            <li key={current.id}
+    const getCharList = () => {
+        return listChar.map((val, i) =>
+            <li key={val.id}
                 tabIndex={0}
-                id={current.id}
-                ref={this.setChar}
+                id={val.id}
+                ref={el => refItem.current[i] = el}
                 className="char__item">
-                <img src={current.thumbnail} alt={current.name}
-                     style={current.thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {}}/>
-                <div className="char__name">{current.name}</div>
+                <img src={val.thumbnail} alt={val.name}
+                     style={val.thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {}}/>
+                <div className="char__name">{val.name}</div>
             </li>
         )
     }
 
-    render() {
-        const {loadList, error, offset, newItemLoading, charEnded} = this.state,
-            errorMsg = error ? <Error/> : null,
-            spiner = loadList ? <Spiner/> : null,
-            charList = !(loadList || error) ? this.GetCharList() : null;
-        return (
-            <div className="char__list">
-                <ul className="char__grid">
-                    {errorMsg}
-                    {spiner}
-                    {charList}
-                </ul>
-                <button
-                    className="button button__main button__long"
-                    disabled={newItemLoading}
-                    style={{'display': charEnded ? 'none' : 'block'}}
-                    onClick={() => this.onRequest(offset)}>
-                    <div
-                        className="inner">load more
-                    </div>
-                </button>
-            </div>
-        )
-    }
+
+    const errorMsg = error ? <Error/> : null,
+        spiner = loadList ? <Spiner/> : null,
+        charsList = !(loadList || error) ? getCharList() : null;
+
+    return (
+        <div className="char__list">
+            <ul className="char__grid">
+                {errorMsg}
+                {spiner}
+                {charsList}
+            </ul>
+            <button
+                className="button button__main button__long"
+                disabled={newItemLoading}
+                style={{'display': charEnded ? 'none' : 'block'}}
+                onClick={() => onRequest(offset)}>
+                <div
+                    className="inner">load more
+                </div>
+            </button>
+        </div>
+    )
+
 }
 
 CharList.propTypes = {
