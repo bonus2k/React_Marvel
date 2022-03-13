@@ -1,33 +1,40 @@
-class MarvelService {
-    _apiBase = 'https://gateway.marvel.com:443/v1/public/'
-    _apiKey = 'apikey=03721cbd56d442b3de40d2f56ceabbc4'
+import {useHttp} from "../components/hooks/http.hook";
 
-    getResource = async (url) => {
-        let res = await fetch(url);
+const useMarvelService = () => {
+    const _apiBase = 'https://gateway.marvel.com:443/v1/public/'
+    const _apiKey = 'apikey=03721cbd56d442b3de40d2f56ceabbc4'
+    const {error, loading, request, clearError} = useHttp();
 
-        if (!res.ok) {
-            throw  new Error(`Could not fetch ${url}, status ${res.status}`);
+    const getAllCharacters = async (offset = 210) => {
+        const res = await request(`${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`);
+        return res.data.results.map(_transformCharacter)
+    }
+
+    const getCharacter = async (id) => {
+        const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
+        return _transformCharacter(res.data.results[0]);
+    }
+
+    const getAllComics = async (offset = 210) => {
+        const res = await request(`${_apiBase}comics?issueNumber=0&limit=8&offset=${offset}&${_apiKey}`)
+        return res.data.results.map(_transformComics);
+    }
+
+    const _transformComics = (comics) => {
+        return {
+            id : comics.id,
+            title: comics.title,
+            thumbnail: `${comics.thumbnail.path}.${comics.thumbnail.extension}`,
+            price: comics.prices[0].price
         }
-
-        return res.json();
     }
 
-    getAllCharacters = async (offset = 210) => {
-        const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`);
-        return res.data.results.map(this._transformCharacter)
-    }
-
-    getCharacter = async (id) => {
-        const res = await this.getResource(`${this._apiBase}characters/${id}?${this._apiKey}`);
-        return this._transformCharacter(res.data.results[0]);
-    }
-
-    _transformCharacter = (char) => {
+    const _transformCharacter = (char) => {
         const str = char.description;
         return {
             id: char.id,
             name: char.name,
-            description: (str.length > 237) ? this.cutStringLastSpaceLength(str, 220) : str,
+            description: (str.length > 237) ? cutStringLastSpaceLength(str, 220) : str,
             thumbnail: `${char.thumbnail.path}.${char.thumbnail.extension}`,
             homepage: char.urls[0].url,
             wiki: char.urls[1].url,
@@ -35,13 +42,15 @@ class MarvelService {
         };
     }
 
-    cutStringLastSpaceLength(str, length) {
+    function cutStringLastSpaceLength(str, length) {
         str = str.substring(0, length);
         if (+str.lastIndexOf(" ") + 5 > length) {
             return str.substring(0, +str.lastIndexOf(" ")).trim() + '...';
         }
         return str.trim() + "...";
     }
+
+    return {getCharacter, getAllCharacters, getAllComics, loading, error, clearError};
 }
 
-export default MarvelService;
+export default useMarvelService;

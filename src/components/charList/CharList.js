@@ -1,32 +1,24 @@
 import './charList.scss';
 
 import {useState, useEffect, useRef} from "react";
-import MarvelService from "../../services/MarvelService";
 import Spiner from "../spiner/Spiner";
 import Error from "../error/Error";
 import PropTypes from 'prop-types';
+import useMarvelService from "../../services/MarvelService";
 
 const CharList = (props) => {
 
     const [listChar, setListChar] = useState([]);
-    const [loadList, setLoadList] = useState(true);
-    const [error, setError] = useState(false);
     const [offset, setOffset] = useState(210);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [charEnded, setCharEnded] = useState(false);
     const refItem = useRef([]);
-    const marvelService = new MarvelService();
+    const {loading, error, getAllCharacters} = useMarvelService();
 
     const setChar = (element) => {
         element.addEventListener('focus', (event) => addSelected(event, element.id));
         element.addEventListener('blur', (event) => removeSelected(event));
     }
-
-    useEffect(() => {
-        refItem.current.forEach(setChar);
-        clearEvent();
-    })
-
 
     const addSelected = (event, id) => {
         findLiElement(event).add('char__item_selected');
@@ -54,35 +46,27 @@ const CharList = (props) => {
         })
     }
 
+    useEffect(() => {
+        onRequest(offset, true); // eslint-disable-next-line
+    }, [])
+
+    useEffect(() => {
+        refItem.current.forEach(setChar);
+        return clearEvent();
+    })
 
     const onLoadCharList = (newListChar) => {
         setListChar(listChar => [...listChar, ...newListChar]);
-        setLoadList(false);
         setNewItemLoading(false);
         setCharEnded(newListChar.length < 9);
         setOffset(offset => offset + 9);
     }
 
-    const onNewItemLoading = () => {
-        setNewItemLoading(true);
-    }
-
-    const onRequest = (offset) => {
-        onNewItemLoading();
-        marvelService
-            .getAllCharacters(offset)
+    const onRequest = (offset, initial) => {
+        setNewItemLoading(!initial);
+        getAllCharacters(offset)
             .then(onLoadCharList)
-            .catch(onError);
     }
-
-    const onError = () => {
-        setError(true);
-        setLoadList(false);
-    }
-
-    useEffect(() => {
-        onRequest(); // eslint-disable-next-line
-    }, [])
 
     const getCharList = () => {
         return listChar.map((val, i) =>
@@ -99,16 +83,16 @@ const CharList = (props) => {
     }
 
 
-    const errorMsg = error ? <Error/> : null,
-        spiner = loadList ? <Spiner/> : null,
-        charsList = !(loadList || error) ? getCharList() : null;
+    const   errorMsg = error ? <Error/> : null,
+            spiner = loading && !newItemLoading ? <Spiner/> : null;
+
 
     return (
         <div className="char__list">
             <ul className="char__grid">
                 {errorMsg}
                 {spiner}
-                {charsList}
+                {getCharList()}
             </ul>
             <button
                 className="button button__main button__long"

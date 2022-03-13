@@ -6,6 +6,7 @@ import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from '../../resources/img/vision.png';
 import {useState} from "react";
+import ComicsList from "../comicsList/ComicsList";
 
 const App = () => {
     const [char, setChar] = useState(null);
@@ -20,18 +21,19 @@ const App = () => {
                 <AppHeader/>
             </ErrorBoundary>
             <main>
-                <ErrorBoundary>
-                    <RandomChar/>
-                </ErrorBoundary>
-                <div className="char__content">
-                    <ErrorBoundary>
-                        <CharList onSelectedChar={onSelectedChar}/>
-                    </ErrorBoundary>
-                    <ErrorBoundary>
-                        <CharInfo selectedChar={char}/>
-                    </ErrorBoundary>
-                </div>
-                <img className="bg-decoration" src={decoration} alt="vision"/>
+                {/*<ErrorBoundary>*/}
+                {/*    <RandomChar/>*/}
+                {/*</ErrorBoundary>*/}
+                {/*<div className="char__content">*/}
+                {/*    <ErrorBoundary>*/}
+                {/*        <CharList onSelectedChar={onSelectedChar}/>*/}
+                {/*    </ErrorBoundary>*/}
+                {/*    <ErrorBoundary>*/}
+                {/*        <CharInfo selectedChar={char}/>*/}
+                {/*    </ErrorBoundary>*/}
+                {/*</div>*/}
+                {/*<img className="bg-decoration" src={decoration} alt="vision"/>*/}
+                <ComicsList/>
             </main>
         </div>
     )

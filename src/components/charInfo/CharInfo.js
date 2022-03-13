@@ -1,16 +1,14 @@
         import './charInfo.scss';
         import {useEffect, useState} from "react";
-        import MarvelService from "../../services/MarvelService";
         import Skeleton from "../skeleton/Skeleton";
         import Spiner from "../spiner/Spiner";
         import Error from "../error/Error";
         import PropTypes from 'prop-types';
+        import useMarvelService from "../../services/MarvelService";
 
         const CharInfo = (props) => {
             const [char, setChar] = useState(null);
-            const [loading, setLoading] = useState(false);
-            const [error, setError] = useState(false);
-
+            const {loading, error, getCharacter, clearError} = useMarvelService();
 
             useEffect(() => {
                 getChar(props.selectedChar); // eslint-disable-next-line
@@ -20,30 +18,13 @@
                 getChar(props.selectedChar); // eslint-disable-next-line
             }, [props.selectedChar])
 
-
-            const onLoadingChar = () => {
-                setLoading(true);
-            }
-
-            const onLoadChar = (char) => {
-                setChar(char);
-                setLoading(false);
-            }
-
-            const onError = () => {
-                setError(true);
-                setLoading(false);
-            }
-
             const getChar = (id) => {
                 if (!props.selectedChar) {
                     return
                 }
-                onLoadingChar();
-                const marvelServices = new MarvelService();
-                marvelServices.getCharacter(id)
-                    .then(onLoadChar)
-                    .catch(onError);
+                clearError();
+                getCharacter(id)
+                    .then(setChar);
             }
 
 
