@@ -5,6 +5,7 @@
         import Error from "../error/Error";
         import PropTypes from 'prop-types';
         import useMarvelService from "../../services/MarvelService";
+        import {Link} from "react-router-dom";
 
         const CharInfo = (props) => {
             const [char, setChar] = useState(null);
@@ -79,7 +80,7 @@
                                 }
                                 return (
                                     <li key={i} className="char__comics-item">
-                                        {item.name}
+                                        <Link to={`/comics/${item.comicId}`}>{item.name}</Link>
                                     </li>
                                 )
 
