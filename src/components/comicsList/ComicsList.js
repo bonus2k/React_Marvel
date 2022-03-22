@@ -1,7 +1,7 @@
 import './comicsList.scss';
 import useMarvelService from "../../services/MarvelService";
 import {useEffect, useState} from "react";
-import Spiner from "../spiner/Spiner";
+import Spinner from "../spinner/Spinner";
 import Error from "../error/Error";
 import {Link} from "react-router-dom";
 
@@ -49,7 +49,7 @@ const ComicsList = () => {
     }
 
     const   errorMsg = error ? <Error/> : null,
-            spiner = loading && !newItemLoad ? <Spiner/> : null;
+            spiner = loading && !newItemLoad ? <Spinner/> : null;
     return (
         <div className="comics__list">
             <ul className="comics__grid">

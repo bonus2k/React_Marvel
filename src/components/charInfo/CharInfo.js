@@ -1,7 +1,7 @@
         import './charInfo.scss';
         import {useEffect, useState} from "react";
         import Skeleton from "../skeleton/Skeleton";
-        import Spiner from "../spiner/Spiner";
+        import Spinner from "../spinner/Spinner";
         import Error from "../error/Error";
         import PropTypes from 'prop-types';
         import useMarvelService from "../../services/MarvelService";
@@ -32,7 +32,7 @@
             {
                 const
                     skeleton = (!char && !error && !loading) ? <Skeleton/> : null,
-                    spiner = (loading) ? <Spiner/> : null,
+                    spiner = (loading) ? <Spinner/> : null,
                     errorMsg = (error && !loading) ? <Error/> : null,
                     info = (char && !error && !loading) ? <View char={char}/> : null;
                 return (

@@ -1,7 +1,7 @@
 import './charList.scss';
 
 import {useState, useEffect, useRef} from "react";
-import Spiner from "../spiner/Spiner";
+import Spinner from "../spinner/Spinner";
 import Error from "../error/Error";
 import PropTypes from 'prop-types';
 import useMarvelService from "../../services/MarvelService";
@@ -84,7 +84,7 @@ const CharList = (props) => {
 
 
     const   errorMsg = error ? <Error/> : null,
-            spiner = loading && !newItemLoading ? <Spiner/> : null;
+            spiner = loading && !newItemLoading ? <Spinner/> : null;
 
 
     return (

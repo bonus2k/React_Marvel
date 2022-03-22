@@ -2,10 +2,10 @@ import './singleComicPage.scss';
 import {useParams, Link} from "react-router-dom";
 import {useEffect, useState} from "react";
 import useMarvelService from "../../services/MarvelService";
-import Spiner from "../spiner/Spiner";
+import Spinner from "../spinner/Spinner";
 import Error from "../error/Error";
 
-export const SingleComicPage = () => {
+const SingleComicPage = () => {
     const {comicId} = useParams();
     const [comic, setComic] = useState(null);
     const {loading, error, getComic, clearError} = useMarvelService();
@@ -20,7 +20,7 @@ export const SingleComicPage = () => {
             .then(setComic);
     }
 
-    const   spiner = (loading) ? <Spiner/> : null,
+    const   spiner = (loading) ? <Spinner/> : null,
             errorMsg = (error && !loading) ? <Error/> : null,
             info = (comic && !error && !loading) ? <View/> : null;
 

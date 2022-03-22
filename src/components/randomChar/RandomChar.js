@@ -1,7 +1,7 @@
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 import {useEffect, useState} from "react";
-import Spiner from "../spiner/Spiner";
+import Spinner from "../spinner/Spinner";
 import Error from "../error/Error";
 import useMarvelService from "../../services/MarvelService";
 
@@ -46,7 +46,7 @@ const RandomChar = () => {
         )
     }
 
-    const load = loading ? <Spiner/> : null,
+    const load = loading ? <Spinner/> : null,
         errorPic = error ? <Error/> : null,
         char = !(loading || error || !charRandom) ? <RenderChar/> : null;
 
