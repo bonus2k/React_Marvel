@@ -49,7 +49,6 @@
         function View({char}) {
             const {description, name, thumbnail, wiki, homepage, comics} = char,
                 style = thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {};
-
             return (
                 <>
                     <div className="char__basics">
