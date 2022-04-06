@@ -37,13 +37,12 @@ const useMarvelService = () => {
     const _transformComics = (comics) => {
         return {
             id : comics.id,
-            title: comics.title,
-            thumbnail: `${comics.thumbnail.path}.${comics.thumbnail.extension}`,
-            price: comics.prices.price ? `${comics.prices.price}$` : `not awaitable`,
-            pages: comics.pageCount ? `${comics.pageCount} p.` : `Not information about of number of page`,
+            name: comics.title,
             desc: comics.description,
-            lang: comics.textObjects.language || "en-us"
-
+            thumbnail: `${comics.thumbnail.path}.${comics.thumbnail.extension}`,
+            price: comics.prices.price ? `${comics.prices.price}$` : `not available`,
+            pages: comics.pageCount ? `${comics.pageCount} p.` : `Not information about of number of page`,
+            lang: comics.textObjects.language ? `Language: ${comics.textObjects.language}` : `Language: en-us`
         }
     }
 
@@ -53,6 +52,7 @@ const useMarvelService = () => {
             id: char.id,
             name: char.name,
             description: (str.length > 237) ? _cutStringLastSpaceLength(str, 220) : str,
+            desc: str,
             thumbnail: `${char.thumbnail.path}.${char.thumbnail.extension}`,
             homepage: char.urls[0].url,
             wiki: char.urls[1].url,
