@@ -5,7 +5,7 @@ import CharInfo from "../charInfo/CharInfo";
 import decoration from "../../resources/img/vision.png";
 import {useState} from "react";
 import FindChar from "../findChar/FindChar";
-
+import Helmet from "react-helmet"
 const MainPage = () => {
     const [char, setChar] = useState(null);
 
@@ -15,6 +15,12 @@ const MainPage = () => {
 
     return (
         <>
+            <Helmet>
+                <meta
+                name="description"
+                content="Marvel information portal"/>
+                <title>Marvel information portal</title>
+            </Helmet>
             <ErrorBoundary>
                 <RandomChar/>
             </ErrorBoundary>
