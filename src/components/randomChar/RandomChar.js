@@ -1,60 +1,28 @@
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 import {useEffect, useState} from "react";
-import Spinner from "../spinner/Spinner";
-import Error from "../error/Error";
 import useMarvelService from "../../services/MarvelService";
+import setContent from "../util/setContent";
 
 
 const RandomChar = () => {
     const [charRandom, setCharRandom] = useState();
-    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const {process, setProcess, getCharacter} = useMarvelService();
 
     useEffect(() => {
         getRandomChar(); // eslint-disable-next-line
     }, [])
 
     const getRandomChar = () => {
-        clearError();
         const id = Math.floor(Math.random() * 400 + 1011000)
         getCharacter(id)
-            .then(setCharRandom);
+            .then(setCharRandom)
+            .then(() => setProcess('done'));
     }
-
-    const RenderChar = () => {
-        const {name, description, thumbnail, homepage, wiki} = charRandom,
-            style = thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {}
-        return (
-            <div className="randomchar__block">
-                <img src={thumbnail} alt="Random character" className="randomchar__img" style={style}/>
-
-                <div className="randomchar__info">
-                    <p className="randomchar__name">{name}</p>
-                    <p className="randomchar__descr">
-                        {description}
-                    </p>
-                    <div className="randomchar__btns">
-                        <a href={homepage} className="button button__main">
-                            <div className="inner">homepage</div>
-                        </a>
-                        <a href={wiki} className="button button__secondary">
-                            <div className="inner">Wiki</div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
-    const load = loading ? <Spinner/> : null,
-        errorPic = error ? <Error/> : null,
-        char = !(loading || error || !charRandom) ? <RenderChar/> : null;
 
     return (
         <div className="randomchar">
-            {errorPic}
-            {load}
-            {char}
+            {setContent(process, View, charRandom)}
             <div className="randomchar__static">
                 <p className="randomchar__title">
                     Random character for today!<br/>
@@ -70,6 +38,30 @@ const RandomChar = () => {
             </div>
         </div>
     )
+}
 
+const View = ({data}) => {
+    const {name, description, thumbnail, homepage, wiki} = data,
+        style = thumbnail.includes('image_not_available.jpg') ? {objectFit: 'fill'} : {}
+    return (
+        <div className="randomchar__block">
+            <img src={thumbnail} alt="Random character" className="randomchar__img" style={style}/>
+
+            <div className="randomchar__info">
+                <p className="randomchar__name">{name}</p>
+                <p className="randomchar__descr">
+                    {description}
+                </p>
+                <div className="randomchar__btns">
+                    <a href={homepage} className="button button__main">
+                        <div className="inner">homepage</div>
+                    </a>
+                    <a href={wiki} className="button button__secondary">
+                        <div className="inner">Wiki</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    )
 }
 export default RandomChar;

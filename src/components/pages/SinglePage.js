@@ -2,46 +2,40 @@ import './characterPage.scss';
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import useMarvelService from "../../services/MarvelService";
-import Spinner from "../spinner/Spinner";
-import Error from "../error/Error";
+import setContent from "../util/setContent";
 
 const SinglePage = ({Container}) => {
     const {comicId, charId} = useParams();
-    const [objectMarvel, setObjectMarvel] = useState(null);
-    const {loading, error, getComic, getCharacter, clearError} = useMarvelService();
-
+    const [data, setData] = useState(null);
+    const {process, setProcess, getComic, getCharacter, clearError} = useMarvelService();
 
     useEffect(() => {
         if (comicId){
-            loadComic(comicId); // eslint-disable-next-line
+            loadComic(comicId);
         }
         if (charId){
             loadChar(charId)
-        }
+        } // eslint-disable-next-line
     }, [comicId, charId])
 
 
     const loadComic = (comicId) => {
         clearError();
         getComic(comicId)
-            .then(setObjectMarvel);
+            .then(setData)
+            .then(() => setProcess('done'));
     }
 
     const loadChar = (charId) => {
         clearError();
         getCharacter(charId)
-            .then(setObjectMarvel);
+            .then(setData)
+            .then(() => setProcess('done'));
     }
-
-    const   spinner = (loading) ? <Spinner/> : null,
-            errorMsg = (error && !loading) ? <Error/> : null,
-            info = (objectMarvel && !error && !loading) ? <Container data = {objectMarvel}/> : null;
 
     return (
         <div className="single-comic">
-            {spinner}
-            {errorMsg}
-            {info}
+            {setContent(process, Container, data)}
         </div>
     )
 

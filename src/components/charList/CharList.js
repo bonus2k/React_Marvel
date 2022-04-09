@@ -84,14 +84,14 @@ const CharList = (props) => {
 
 
     const   errorMsg = error ? <Error/> : null,
-            spiner = loading && !newItemLoading ? <Spinner/> : null;
+            spinner = loading && !newItemLoading ? <Spinner/> : null;
 
 
     return (
         <div className="char__list">
             <ul className="char__grid">
                 {errorMsg}
-                {spiner}
+                {spinner}
                 {getCharList()}
             </ul>
             <button

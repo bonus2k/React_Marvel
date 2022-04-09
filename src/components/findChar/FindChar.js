@@ -2,7 +2,7 @@ import './findChar.scss';
 import {useCallback, useState} from "react";
 import Error from "../error/Error";
 import useMarvelService from "../../services/MarvelService";
-import {Link, NavLink} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import {Formik, Form, Field, ErrorMessage} from "formik";
 import * as Yup from "yup";
 
@@ -14,7 +14,7 @@ const FindChar = () => {
     const getChar = useCallback((name) => {
         clearError();
         getCharacterName(name)
-            .then(setCharacter);
+            .then(setCharacter); // eslint-disable-next-line
     }, [])
 
 
@@ -42,7 +42,7 @@ function View(props) {
                 .min(3, "The length name is least 3 characters")
                 .required("Required name")
         })
-    };
+    }
 
     function ValidateChar(){
 
